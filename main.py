@@ -1,9 +1,32 @@
 import struct
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn import model_selection
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import learning_curve
+
+def plot_learning_curve(clfr, X, Y):
+    kfold = model_selection.KFold(n_splits=10)
+    cv_results = model_selection.cross_val_score(clfr, X, Y, cv=kfold, scoring='accuracy')
+
+    train_sizes, train_scores, test_scores = learning_curve(clfr, X, Y, train_sizes=[300, 600, 2000, 10000, 25000, 32000, 45000, 56000], cv=5)
+    train_scores_mean = np.mean(train_scores, axis=1)
+    train_scores_std = np.std(train_scores, axis=1)
+    test_scores_mean = np.mean(test_scores, axis=1)
+    test_scores_std = np.std(test_scores, axis=1)
+
+    _, axes = plt.subplots(1, 2, figsize=(20, 5))
+    # Plot learning curve
+    axes[0].fill_between(train_sizes, train_scores_mean - train_scores_std, train_scores_mean + train_scores_std, alpha=0.1, color="r")
+    axes[0].fill_between(train_sizes, test_scores_mean - test_scores_std, test_scores_mean + test_scores_std, alpha=0.1, color="g")
+    axes[0].plot(train_sizes, train_scores_mean, "o-", color="r", label="Training score")
+    axes[0].plot(train_sizes, test_scores_mean, "o-", color="g", label="Cross-validation score")
+    axes[0].legend(loc="best")
+
+    axes[1].boxplot(cv_results)
+
+    plt.show()
 
 class IncorrectCounts:
     zero = 0
@@ -93,36 +116,8 @@ print(score)
 # Find incorrect counts
 incorrect_counts(y_test, y_pred)
 
-train_sizes, train_scores, test_scores = learning_curve(clf, x_train, y_train,
-                                                        train_sizes=[300, 600, 2000, 10000, 25000, 45000], cv=5)
-train_scores_mean = np.mean(train_scores, axis=1)
-train_scores_std = np.std(train_scores, axis=1)
-test_scores_mean = np.mean(test_scores, axis=1)
-test_scores_std = np.std(test_scores, axis=1)
-axes = None
-if axes is None:
-    _, axes = plt.subplots(1, 2, figsize=(20, 5))
-# Plot learning curve
-axes[0].fill_between(
-    train_sizes,
-    train_scores_mean - train_scores_std,
-    train_scores_mean + train_scores_std,
-    alpha=0.1,
-    color="r",
-)
-axes[0].fill_between(
-    train_sizes,
-    test_scores_mean - test_scores_std,
-    test_scores_mean + test_scores_std,
-    alpha=0.1,
-    color="g",
-)
-axes[0].plot(
-    train_sizes, train_scores_mean, "o-", color="r", label="Training score"
-)
-axes[0].plot(
-    train_sizes, test_scores_mean, "o-", color="g", label="Cross-validation score"
-)
-axes[0].legend(loc="best")
+# Plot Learning Curve
+X_plot = np.append(x_train, x_test, 0)
+Y_plot = np.append(y_train, y_test, 0)
 
-plt.show()
+plot_learning_curve(clf, X_plot, Y_plot)
