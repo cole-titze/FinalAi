@@ -114,10 +114,10 @@ score = accuracy_score(y_test, y_pred)
 print(score)
 
 # Find incorrect counts
-incorrect_counts(y_test, y_pred)
+#incorrect_counts(y_test, y_pred)
 
 # Plot Learning Curve
 X_plot = np.append(x_train, x_test, 0)
 Y_plot = np.append(y_train, y_test, 0)
 
-plot_learning_curve(clf, X_plot, Y_plot)
+#plot_learning_curve(clf, X_plot, Y_plot)
